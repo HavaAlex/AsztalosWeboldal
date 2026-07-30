@@ -1,0 +1,48 @@
+require('dotenv').config();
+
+const { Sequelize, DataTypes } = require("sequelize");
+
+const sequelize = new Sequelize
+(
+    process.env.DB_NAME,
+    process.env.DB_USERNAME,
+    process.env.DB_PASSWORD,
+    
+    {
+        host: process.env.DB_HOST,
+        dialect: process.env.DB_DIALECT,
+        logging: false,
+    }
+)
+
+
+const db = {};
+
+db.Sequelize = Sequelize;
+
+db.sequelize = sequelize;
+
+const { User,Category,Image,Post,CategoryConnection } = require("../models")(sequelize, DataTypes);
+
+db.user = User;
+db.category = Category
+db.image = Image
+db.post = Post
+db.categoryConnection = CategoryConnection
+
+sequelize.sync({ force: false })
+    .then(() => {
+        console.log("Database & tables created!");
+    })
+    .catch(err => {
+        console.error("Error creating database & tables:", err);
+    });
+ 
+try {
+    sequelize.authenticate();
+    console.log("Database Connected");
+} catch (err) {
+    console.error("Error connecting to the database:", err);
+}
+
+module.exports = db;
